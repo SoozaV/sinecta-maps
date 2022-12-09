@@ -36,6 +36,10 @@ export const Polygons = () => {
       const selectedPolygon = draw?.getSelectedIds();
       if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
     });
+    map?.on("touchend", () => {
+      const selectedPolygon = draw?.getSelectedIds();
+      if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
+    });
   }, [isMapReady]);
 
   const centerPolygonOnMap = (polygonId: any) => {
@@ -64,7 +68,7 @@ export const Polygons = () => {
         className="list-group-item list-group-item-action d-flex justify-content-left align-items-center sticky-top"
       >
         <div>
-          <div
+          <div 
             style={{
               borderRadius: "50px",
               border: "none",
@@ -98,7 +102,7 @@ export const Polygons = () => {
             key={index}
           >
             <div>
-              <Marker fill="#9857ff" />
+              <Marker className="marker-icon" fill="#9857ff" />
             </div>
             <div className="px-3" style={{ flex: 1, minWidth: 0 }}>
               {/*<div style={{ fontSize: "11px", color: "#979797" }}>ID: {polygon.id}</div>*/}

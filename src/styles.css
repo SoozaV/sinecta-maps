@@ -34,13 +34,22 @@
   display: none;
 }
 
-.polygons-list li:first-child {
+.polygons-list li {
   cursor: pointer;
 }
 
 .polygons-list li {
   background-color: #dad8d8;
   padding: 0.6rem 0.8rem;
+}
+
+.polygons-list li > div svg {
+  transform: scale(1);
+  transition: all 0.2s;
+}
+.polygons-list li:hover > div svg {
+  transform: scale(1.2);
+  transition: all 0.2s;
 }
 
 .polygons-list .delete-polygon {
