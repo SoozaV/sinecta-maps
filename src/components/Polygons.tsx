@@ -96,10 +96,12 @@ export const Polygons = () => {
             <div>
               <Marker fill="#9857ff" />
             </div>
-            <div className="text-truncate px-3" style={{ flexGrow: 1 }}>
+            <div className="px-3" style={{ flex: 1, minWidth: 0 }}>
               {/*<div style={{ fontSize: "11px", color: "#979797" }}>ID: {polygon.id}</div>*/}
               <div>Título</div>
-              <div>Ubicación</div>
+              <div className="text-truncate">
+                {polygon.properties?.place_name}
+              </div>
               <div
                 className="font-weight-bold"
                 style={{ fontSize: "12px", color: "#575757" }}

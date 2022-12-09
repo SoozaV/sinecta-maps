@@ -2,7 +2,9 @@ import { useReducer } from "react";
 import { PolygonsContext } from "./PolygonsContext";
 import { polygonsReducer } from "./polygonsReducer";
 
-import turf from "turf";
+import geocodingApi from "../../apis/geocodingApi";
+
+import turf, { polygon } from "turf";
 
 export interface Polygon {
   polygon: GeoJSON.Feature;
@@ -23,9 +25,28 @@ interface Props {
   children: JSX.Element | JSX.Element[];
 }
 
+const getPolygonCoords = (polygon: GeoJSON.Feature) => {
+  const coords = JSON.parse(JSON.stringify(polygon.geometry));
+  return coords.coordinates;
+};
+
+const getPolygonCenter = (polygon: GeoJSON.Feature) => turf.centroid(polygon);
+
+const setPolygonAdress = async (polygon: GeoJSON.Feature) => {
+  const polygonCenter = getPolygonCenter(polygon);
+  const lng = polygonCenter.geometry.coordinates[0];
+  const lat = polygonCenter.geometry.coordinates[1];
+  return await geocodingApi.get(`/${lng},${lat}.json`).then((res) => {
+    polygon.properties = {
+      ...polygon.properties,
+      place_name: res.data.features[0].place_name,
+    };
+    return polygon;
+  });
+};
+
 const setPolygonArea = (polygon: GeoJSON.Feature) => {
-  let coords = JSON.parse(JSON.stringify(polygon.geometry));
-  coords = coords.coordinates;
+  const coords = getPolygonCoords(polygon);
 
   const currentPolygon = turf.polygon(coords);
   const polygonArea = turf.area(currentPolygon);
@@ -33,7 +54,6 @@ const setPolygonArea = (polygon: GeoJSON.Feature) => {
     ...polygon.properties,
     area: polygonArea.toLocaleString(undefined, { maximumFractionDigits: 2 }),
   };
-
   return polygon;
 };
 
@@ -41,12 +61,22 @@ export function PolygonsProvider({ children }: Props) {
   const [state, dispatch] = useReducer(polygonsReducer, INITIAL_STATE);
 
   const updatePolygonsArray = (e: GeoJSON.Feature) => {
-    dispatch({ type: "updatePolygonsArray", payload: setPolygonArea(e) });
+    setPolygonAdress(e).then((polygon) => {
+      dispatch({
+        type: "updatePolygonsArray",
+        payload: setPolygonArea(polygon),
+      });
+    });
   };
 
   const loadFirstPolygons = (e: GeoJSON.Feature[]) => {
     e.forEach((polygon) => {
-      dispatch({ type: "loadFirstPolygons", payload: setPolygonArea(polygon) });
+      setPolygonAdress(polygon).then((polygon) => {
+        dispatch({
+          type: "loadFirstPolygons",
+          payload: setPolygonArea(polygon),
+        });
+      });
     });
   };
 
