@@ -13,11 +13,27 @@
   color: white;
   height: 100vh;
 }
-
-.custom-popup .mapboxgl-popup-content {
-  color:rgba(0, 0, 0, 0.8)
+.polygons-row {
+  min-height: 100vh;
 }
 
-.custom-popup .mapboxgl-popup-close-button {
-  outline: none;
+.polygons-sidebar {
+  flex: none;
+}
+
+.polygons-list-container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  /* Hide scrollbar for IE, Edge and Firefox */
+  border-radius: 5px;
+  overflow-y: auto;
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.polygons-list-container::-webkit-scrollbar {
+  display: none;
+}
+
+.polygons-list li {
+  background-color: #dad8d8;
 }

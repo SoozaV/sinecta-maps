@@ -23,5 +23,5 @@ export const MapView = () => {
   if (isLoading) {
     return <Loading />;
   }
-  return <div ref={mapDiv} className="loaded-map col"></div>;
+  return <div ref={mapDiv} className="loaded-map col col-md-8"></div>;
 };

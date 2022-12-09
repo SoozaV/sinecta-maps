@@ -8,6 +8,7 @@ const polygonsData = require("../../polygons");
 
 export interface MapState {
   isMapReady: boolean;
+  draw?: MapboxDraw
   map?: Map;
 }
 
@@ -15,22 +16,23 @@ type Props = {
   children: JSX.Element | JSX.Element[];
 };
 
+const draw = new MapboxDraw({
+  displayControlsDefault: false,
+  controls: {
+    polygon: true,
+    trash: true,
+  },
+  //defaultMode: "draw_polygon",
+});
+
 const INITIAL_STATE: MapState = {
   isMapReady: false,
+  draw,
   map: undefined,
 };
 
 export const MapProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(mapReducer, INITIAL_STATE);
-
-  const draw = new MapboxDraw({
-    displayControlsDefault: false,
-    controls: {
-      polygon: true,
-      trash: true,
-    },
-    //defaultMode: "draw_polygon",
-  });
 
   const setMap = (map: Map) => {
     map.on("load", () => {
