@@ -22,11 +22,11 @@
 }
 
 .polygons-list-container {
-  -ms-overflow-style: none;  /* IE and Edge */
+  -ms-overflow-style: none; /* IE and Edge */
   /* Hide scrollbar for IE, Edge and Firefox */
   border-radius: 5px;
   overflow-y: auto;
-  scrollbar-width: none;  /* Firefox */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -34,6 +34,40 @@
   display: none;
 }
 
+.polygons-list li:first-child {
+  cursor: pointer;
+}
+
 .polygons-list li {
   background-color: #dad8d8;
+  padding: 0.6rem 0.8rem;
+}
+
+.polygons-list .delete-polygon {
+  background-color: #868686;
+  border: none;
+  border-radius: 5px;
+  padding: 0.1rem 0.3rem;
+}
+.polygons-list .delete-polygon:hover {
+  background-color: rgb(179, 25, 25);
+  cursor: pointer;
+}
+.polygons-list .delete-polygon:focus {
+  outline: none;
+}
+.polygons-list .delete-polygon:active {
+  background-color: rgb(80, 80, 80);
+}
+.polygons-list .delete-polygon:hover svg {
+  fill: white;
+}
+
+@media screen and (max-width: 767px) {
+  .polygons-sidebar {
+    max-height: 30vh;
+  }
+  .polygons-sidebar .polygons-list-container {
+    height: 25vh;
+  }
 }

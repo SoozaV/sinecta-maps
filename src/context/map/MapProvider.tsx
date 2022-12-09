@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { Map } from "mapbox-gl";
+import mapboxgl, { Map } from "mapbox-gl";
 import { MapContext } from "./MapContext";
 import { mapReducer } from "./mapReducer";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -8,7 +8,7 @@ const polygonsData = require("../../polygons");
 
 export interface MapState {
   isMapReady: boolean;
-  draw?: MapboxDraw
+  draw?: MapboxDraw;
   map?: Map;
 }
 
@@ -20,7 +20,7 @@ const draw = new MapboxDraw({
   displayControlsDefault: false,
   controls: {
     polygon: true,
-    trash: true,
+    trash: false,
   },
   //defaultMode: "draw_polygon",
 });
@@ -39,6 +39,7 @@ export const MapProvider = ({ children }: Props) => {
       draw.set(polygonsData as GeoJSON.FeatureCollection);
     });
     map.addControl(draw);
+    map.addControl(new mapboxgl.NavigationControl(), "top-left");
     dispatch({ type: "setMap", payload: map });
   };
 
