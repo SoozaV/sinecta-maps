@@ -4,7 +4,7 @@ import { polygonsReducer } from "./polygonsReducer";
 
 import geocodingApi from "../../apis/geocodingApi";
 
-import turf, { polygon } from "turf";
+import turf from "turf";
 
 export interface Polygon {
   polygon: GeoJSON.Feature;
@@ -52,7 +52,7 @@ const setPolygonArea = (polygon: GeoJSON.Feature) => {
   const polygonArea = turf.area(currentPolygon);
   polygon.properties = {
     ...polygon.properties,
-    area: polygonArea.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+    area: polygonArea,
   };
   return polygon;
 };

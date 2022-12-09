@@ -12,9 +12,9 @@ export const MapView = () => {
     if (!isLoading) {
       const map = new Map({
         container: mapDiv.current!,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/mapbox/satellite-v9",
         center: userLocation,
-        zoom: 14,
+        zoom: 12,
       });
       setMap(map);
     }
@@ -23,5 +23,5 @@ export const MapView = () => {
   if (isLoading) {
     return <Loading />;
   }
-  return <div ref={mapDiv} className="loaded-map col col-md-8"></div>;
+  return <div ref={mapDiv} className="" style={{position: "absolute", top: 0, bottom: 0, width: "100%"}}></div>;
 };

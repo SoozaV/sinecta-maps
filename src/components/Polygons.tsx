@@ -32,6 +32,10 @@ export const Polygons = () => {
       const newPolygon = e.features[0] as GeoJSON.Feature;
       updatePolygonsArray(newPolygon);
     });
+    map?.on("click", () => {
+      const selectedPolygon = draw?.getSelectedIds();
+      if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
+    });
   }, [isMapReady]);
 
   const centerPolygonOnMap = (polygonId: any) => {
@@ -106,7 +110,10 @@ export const Polygons = () => {
                 className="font-weight-bold"
                 style={{ fontSize: "12px", color: "#575757" }}
               >
-                Area: {`${polygon.properties?.area}m²`}
+                Area:{" "}
+                {`${polygon.properties?.area.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}m²`}
               </div>
             </div>
             <div>

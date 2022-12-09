@@ -6,12 +6,17 @@ export const HomeScreen = () => {
     <div className="container-fluid">
       {/*<BtnMyLocation />*/}
       <div className="row flex-column flex-md-row polygons-row">
-        <aside className="col col-md-4 py-3 polygons-sidebar" style={{ maxHeight: "100vh" }}>
+        <aside
+          className="col col-md-4 py-3 polygons-sidebar"
+          style={{ maxHeight: "100vh" }}
+        >
           <div className="mh-100 polygons-list-container">
             <Polygons />
           </div>
         </aside>
-        <MapView />
+        <div className="loaded-map col col-md-8 p-0">
+          <MapView />
+        </div>
         <SinectaLogo />
       </div>
     </div>
