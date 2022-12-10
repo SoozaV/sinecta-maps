@@ -36,7 +36,7 @@ export const Polygons = () => {
       const selectedPolygon = draw?.getSelectedIds();
       if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
     });
-    map?.on("touchstart", () => {
+    map?.on("dblclick", () => {
       const selectedPolygon = draw?.getSelectedIds();
       if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
     });
