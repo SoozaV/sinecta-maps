@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useState, useRef } from "react";
 import { MapContext } from "../context";
 import { PolygonsContext } from "../context/polygons/PolygonsContext";
 
@@ -14,6 +14,13 @@ const featureCollection = polygonsData as GeoJSON.FeatureCollection;
 const firstPolygons = featureCollection.features.map((feature) => feature);
 
 export const Polygons = () => {
+  const listRef = useRef<HTMLUListElement>(null);
+  const listItemRef = useRef<HTMLLIElement[]>([]);
+
+  const [activePolygon, setActivePolygon] = useState({
+    polygonId: "",
+    index: 0,
+  });
   const { map, isMapReady, draw } = useContext(MapContext);
   const {
     polygons,
@@ -21,26 +28,6 @@ export const Polygons = () => {
     updatePolygonsArray,
     deletePolygonFromArray,
   } = useContext(PolygonsContext);
-
-  useLayoutEffect(() => {
-    map?.on("load", () => {
-      if (isMapReady) {
-        loadFirstPolygons(firstPolygons);
-      }
-    });
-    map?.on("draw.create", (e) => {
-      const newPolygon = e.features[0] as GeoJSON.Feature;
-      updatePolygonsArray(newPolygon);
-    });
-    map?.on("click", () => {
-      const selectedPolygon = draw?.getSelectedIds();
-      if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
-    });
-    map?.on("dblclick", () => {
-      const selectedPolygon = draw?.getSelectedIds();
-      if (selectedPolygon?.length) centerPolygonOnMap(selectedPolygon[0]);
-    });
-  }, [isMapReady]);
 
   const centerPolygonOnMap = (polygonId: any) => {
     let selectedPolygon = draw!.get(polygonId) as GeoJSON.Feature;
@@ -55,20 +42,71 @@ export const Polygons = () => {
     }
   };
 
+  const getListElementIndex = (itemId: string): number => {
+    if (listRef.current) {
+      const currentListElement = listRef.current?.children.namedItem(itemId);
+      if (currentListElement) {
+        const index = currentListElement?.getAttribute("data-key");
+        return Number(index);
+      }
+    }
+    return listItemRef.current.length;
+  };
+
+  // FIX: Scroll to bottom when new polygon is created not working
+  const scrollToListElement = (index: number) => {
+    if (listRef.current && listItemRef.current.length) {
+      listRef.current.scrollTo({
+        behavior: "smooth",
+        top: listItemRef.current[0].getBoundingClientRect().height * index,
+      });
+    }
+  };
+
   const deletePolygon = (polygon: GeoJSON.Feature, index: number) => {
     const polygonId = polygon.id as string;
     deletePolygonFromArray(polygon, index);
     draw!.delete(polygonId);
   };
 
+  useLayoutEffect(() => {
+    map?.on("load", () => {
+      if (isMapReady && draw) {
+        draw.set(polygonsData as GeoJSON.FeatureCollection);
+        loadFirstPolygons(firstPolygons);
+
+        map
+          .on("click", () => {
+            const selectedPolygon = draw?.getSelectedIds()[0];
+            if (selectedPolygon) {
+              centerPolygonOnMap(selectedPolygon);
+              setActivePolygon({
+                index: getListElementIndex(selectedPolygon),
+                polygonId: selectedPolygon,
+              });
+              scrollToListElement(getListElementIndex(selectedPolygon));
+            }
+          })
+          .on("draw.create", (e) => {
+            const newPolygon = e.features[0] as GeoJSON.Feature;
+            updatePolygonsArray(newPolygon);
+            scrollToListElement(getListElementIndex(newPolygon.id as string));
+          });
+      }
+    });
+  }, [isMapReady, listRef, polygons]);
+
   return (
-    <ul className="list-unstyled list-group polygons-list h-100 overflow-hidden">
+    <ul
+      ref={listRef}
+      className="list-unstyled list-group mh-100 polygons-list-container polygons-list"
+    >
       <li
         onClick={() => draw!.changeMode("draw_polygon")}
         className="list-group-item list-group-item-action d-flex justify-content-left align-items-center sticky-top"
       >
         <div>
-          <div 
+          <div
             style={{
               borderRadius: "50px",
               border: "none",
@@ -97,15 +135,22 @@ export const Polygons = () => {
       {polygons &&
         polygons.features.map((polygon, index) => (
           <li
-            onClick={() => centerPolygonOnMap(polygon.id)}
-            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            ref={(el) => (listItemRef.current[index] = el as HTMLLIElement)}
+            onClick={() => {
+              setActivePolygon({ polygonId: polygon.id as string, index });
+              centerPolygonOnMap(polygon.id);
+            }}
+            className={`${
+              activePolygon.polygonId === polygon.id ? "active" : ""
+            } list-group-item list-group-item-action d-flex justify-content-between align-items-center`}
             key={index}
+            data-key={index}
+            id={polygon.id as string}
           >
             <div>
               <Marker className="marker-icon" fill="#9857ff" />
             </div>
             <div className="px-3" style={{ flex: 1, minWidth: 0 }}>
-              {/*<div style={{ fontSize: "11px", color: "#979797" }}>ID: {polygon.id}</div>*/}
               <div>Título</div>
               <div className="text-truncate">
                 {polygon.properties?.place_name}

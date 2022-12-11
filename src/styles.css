@@ -43,11 +43,17 @@
   padding: 0.6rem 0.8rem;
 }
 
-.polygons-list li > div svg {
+.polygons-list li.active {
+  background-color: #f8f9fa;
+  color: #495057;
+  border-color: rgba(0,0,0,.125);
+}
+
+.polygons-list li > div svg.marker-icon {
   transform: scale(1);
   transition: all 0.2s;
 }
-.polygons-list li:hover > div svg {
+.polygons-list li:hover > div svg.marker-icon {
   transform: scale(1.2);
   transition: all 0.2s;
 }

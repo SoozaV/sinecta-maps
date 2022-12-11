@@ -10,9 +10,7 @@ export const HomeScreen = () => {
           className="col col-md-4 py-3 polygons-sidebar"
           style={{ maxHeight: "100vh" }}
         >
-          <div className="mh-100 polygons-list-container">
-            <Polygons />
-          </div>
+          <Polygons />
         </aside>
         <div className="loaded-map col col-md-8 p-0">
           <MapView />
