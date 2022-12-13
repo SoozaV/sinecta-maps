@@ -16,6 +16,7 @@ export const polygonsReducer = (
         ...state,
       };
     case "loadFirstPolygons":
+      action.payload.id = action.payload.properties?.id;
       state.polygons?.features.push(action.payload);
       return {
         ...state,

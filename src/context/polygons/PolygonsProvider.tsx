@@ -5,6 +5,7 @@ import { polygonsReducer } from "./polygonsReducer";
 import geocodingApi from "../../apis/geocodingApi";
 
 import turf from "turf";
+import polygonsApi from "../../apis/polygonsApi";
 
 export interface Polygon {
   polygon: GeoJSON.Feature;
@@ -30,9 +31,10 @@ const getPolygonCoords = (polygon: GeoJSON.Feature) => {
   return coords.coordinates;
 };
 
-const getPolygonCenter = (polygon: GeoJSON.Feature) => turf.centroid(polygon);
+const getPolygonCenter = (polygon: GeoJSON.Feature<GeoJSON.Polygon>) =>
+  turf.centroid(polygon);
 
-const setPolygonAdress = async (polygon: GeoJSON.Feature) => {
+const setPolygonAdress = async (polygon: GeoJSON.Feature<GeoJSON.Polygon>) => {
   const polygonCenter = getPolygonCenter(polygon);
   const lng = polygonCenter.geometry.coordinates[0];
   const lat = polygonCenter.geometry.coordinates[1];
@@ -45,7 +47,8 @@ const setPolygonAdress = async (polygon: GeoJSON.Feature) => {
   });
 };
 
-const setPolygonArea = (polygon: GeoJSON.Feature) => {
+const setPolygonArea = (polygon: GeoJSON.Feature<GeoJSON.Polygon>) => {
+  if (polygon.properties && polygon.properties.area) return polygon;
   const coords = getPolygonCoords(polygon);
 
   const currentPolygon = turf.polygon(coords);
@@ -60,7 +63,19 @@ const setPolygonArea = (polygon: GeoJSON.Feature) => {
 export function PolygonsProvider({ children }: Props) {
   const [state, dispatch] = useReducer(polygonsReducer, INITIAL_STATE);
 
-  const updatePolygonsArray = (e: GeoJSON.Feature) => {
+  const updatePolygonProperties = (
+    polygon: GeoJSON.Feature<GeoJSON.Polygon>,
+    name?: string
+  ) => {
+    if (!polygon.properties) polygon.properties = {};
+    name
+      ? (polygon.properties.name = name)
+      : (polygon.properties.name = "Title Placeholder");
+    if (!polygon.properties.area) polygon = setPolygonArea(polygon);
+    return polygon;
+  };
+
+  const updatePolygonsArray = (e: GeoJSON.Feature<GeoJSON.Polygon>) => {
     setPolygonAdress(e).then((polygon) => {
       dispatch({
         type: "updatePolygonsArray",
@@ -69,14 +84,20 @@ export function PolygonsProvider({ children }: Props) {
     });
   };
 
-  const loadFirstPolygons = (e: GeoJSON.Feature[]) => {
-    e.forEach((polygon) => {
-      setPolygonAdress(polygon).then((polygon) => {
-        dispatch({
-          type: "loadFirstPolygons",
-          payload: setPolygonArea(polygon),
-        });
-      });
+  const loadFirstPolygons = async () => {
+    const { data } = await polygonsApi.get("/api/polygons");
+
+    const fc = data.data[0][0].json_build_object as GeoJSON.FeatureCollection;
+
+    fc.features.forEach((polygon) => {
+      setPolygonAdress(polygon as GeoJSON.Feature<GeoJSON.Polygon>).then(
+        (polygon) => {
+          dispatch({
+            type: "loadFirstPolygons",
+            payload: setPolygonArea(polygon),
+          });
+        }
+      );
     });
   };
 
@@ -89,6 +110,7 @@ export function PolygonsProvider({ children }: Props) {
     <PolygonsContext.Provider
       value={{
         ...state,
+        updatePolygonProperties,
         updatePolygonsArray,
         loadFirstPolygons,
         deletePolygonFromArray,
