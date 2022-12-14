@@ -79,8 +79,7 @@ export const Polygons = () => {
 
   const deletePolygon = async (polygon: GeoJSON.Feature, index: number) => {
     const polygonId = polygon.id as string;
-    const res = await polygonsApi.delete(`/api/polygons/${polygonId}`);
-    console.log("BORRADO", res);
+    await polygonsApi.delete(`/api/polygons/${polygonId}`);
     deletePolygonFromArray(polygon, index);
     draw!.delete(polygonId);
   };
@@ -94,15 +93,23 @@ export const Polygons = () => {
 
   useLayoutEffect(() => {
     map?.on("load", async () => {
-      await polygonsApi.get("/api/polygons").then(({ data }) => {
-        const fc = data.data[0][0]
-          .json_build_object as GeoJSON.FeatureCollection;
-        fc.features.map((feature) => (feature.id = feature.properties?.id));
-        if (isMapReady && draw) {
-          draw.set(fc);
-          loadFirstPolygons(fc);
-        }
-      });
+      try {
+        await polygonsApi.get("/api/polygons").then(({ data }) => {
+          const fc = data.data[0][0]
+            .json_build_object as GeoJSON.FeatureCollection;
+          if (!fc.features.length)
+            throw new Error("Agrega tu primer polígono!");
+          fc.features.map((feature) => (feature.id = feature.properties?.id));
+          if (isMapReady && draw) {
+            draw.set(fc);
+            loadFirstPolygons(fc);
+          }
+        });
+      } catch (error) {
+        error instanceof Error
+          ? console.log("Add your first Polygon!")
+          : console.log(error);
+      }
     });
 
     if (isMapReady) {
@@ -171,7 +178,7 @@ export const Polygons = () => {
             </p>
           </div>
         </li>
-        {polygons &&
+        {polygons?.features.length ?
           polygons.features.map((polygon, index) => (
             <li
               ref={(el) => (listItemRef.current[index] = el as HTMLLIElement)}
@@ -216,7 +223,8 @@ export const Polygons = () => {
                 </button>
               </div>
             </li>
-          ))}
+          )) : 
+          <li className="text-center py-5">Add your first Polygon!</li> }
       </ul>
     </>
   );
