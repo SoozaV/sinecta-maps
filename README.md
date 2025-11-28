@@ -1,46 +1,189 @@
-# Getting Started with Create React App
+# 🗺️ Sinecta Maps
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![CI](https://github.com/USERNAME/sinecta-maps/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/sinecta-maps/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://reactjs.org/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black.svg)](https://sinecta-maps.vercel.app/)
 
-## Available Scripts
+> Professional React + TypeScript application for drawing, editing, and managing polygons on interactive maps using Mapbox GL JS.
 
-In the project directory, you can run:
+![Demo GIF](./docs/demo.gif)
 
-### `npm start`
+## ✨ Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- 🎨 **Draw custom polygons** with Mapbox Draw
+- ✏️ **Edit vertices and shapes** interactively
+- 🗑️ **Delete polygons** with one click
+- 📏 **Calculate area and perimeter** automatically
+- 📥 **Export/Import GeoJSON** for data persistence
+- 🎯 **Responsive and mobile-friendly** design
+- 🔍 **Geocoding integration** for address lookup
+- 📍 **Real-time polygon selection** and highlighting
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🚀 Quick Start
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js 20+ and npm
+- Mapbox Access Token ([Get one here](https://account.mapbox.com/access-tokens/))
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+# Clone the repository
+git clone https://github.com/USERNAME/sinecta-maps.git
+cd sinecta-maps/sinecta-maps-frontend
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Install dependencies
+npm install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Copy environment variables
+cp .env.example .env
 
-### `npm run eject`
+# Add your Mapbox token to .env
+# VITE_MAPBOX_ACCESS_TOKEN=pk.your_token_here
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# Start development server
+npm run dev
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The app will be available at `http://localhost:3000`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 🏗️ Tech Stack
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- **React 19.2** + **TypeScript 5.9** - Modern UI with type safety
+- **Vite 7.2** - Fast build tool and dev server
+- **Mapbox GL JS 2.11** + **Mapbox Draw 1.3** - Interactive mapping
+- **Zustand 5.0** - Lightweight state management
+- **Turf.js 7.1** - Geospatial calculations
+- **Vitest 4.0** - Fast unit testing
+- **Axios 1.2** - HTTP client
 
-## Learn More
+## 📊 Code Quality
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- ✅ **Test Coverage**: >70% (target >80%)
+- ✅ **TypeScript**: Strict mode enabled
+- ✅ **ESLint**: Zero warnings
+- ✅ **CI/CD**: Automated testing and deployment with GitHub Actions
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📁 Project Structure
+
+```
+src/
+├── components/        # React components
+│   ├── Polygons.tsx  # Main polygon list
+│   ├── MapView.tsx   # Map component
+│   └── PolygonList/  # Polygon list sub-components
+├── hooks/            # Custom React hooks
+│   ├── usePolygonSelection.ts
+│   ├── usePolygonOperations.ts
+│   ├── usePolygonViewport.ts
+│   └── usePolygonMapEvents.ts
+├── stores/           # Zustand stores
+│   ├── usePolygonsStore.ts
+│   └── useGlobalStore.ts
+├── context/          # React Context providers
+│   ├── MapContext.ts
+│   └── PlacesContext.ts
+├── utils/            # Utility functions
+│   ├── polygon.utils.ts
+│   └── errorHandler.ts
+├── services/         # Service layer
+│   └── geojson.service.ts
+├── apis/             # API clients
+│   ├── polygonsApi.ts
+│   └── geocodingApi.ts
+├── types/            # TypeScript definitions
+└── constants/        # Configuration values
+```
+
+## 🧪 Testing
+
+```bash
+# Run tests in watch mode
+npm run test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests once with coverage
+npm run test:coverage
+
+# Run tests once (CI mode)
+npm run test:run
+```
+
+### Testing Strategy
+
+- **Unit tests** for utilities and hooks
+- **Component tests** with React Testing Library
+- **Integration tests** for user flows
+- **Mocked Mapbox** for isolated testing
+
+## 🚀 Deployment
+
+The application is automatically deployed to Vercel on push to `main` branch.
+
+### Manual Deployment
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Environment Variables
+
+Configure these in your deployment platform:
+
+- `VITE_MAPBOX_ACCESS_TOKEN` - Mapbox public access token (required)
+- `VITE_MAPBOX_GEOCODING_TOKEN` - Mapbox geocoding token (optional, can use same as above)
+
+## 📖 Documentation
+
+- [Architecture Overview](./docs/ARCHITECTURE.md) - Detailed architecture documentation
+- [API Integration](./docs/API.md) - Backend API integration (coming soon)
+
+## 🛠️ Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run test` - Run tests in watch mode
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Generate coverage report
+- `npm run test:run` - Run tests once (CI mode)
+
+### Code Style
+
+This project uses ESLint with TypeScript and React plugins. Run linting:
+
+```bash
+npx eslint . --ext .ts,.tsx
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 👤 Author
+
+[Your Name](https://github.com/USERNAME)
+
+---
+
+**Note**: Replace `USERNAME` in badges and links with your actual GitHub username.
