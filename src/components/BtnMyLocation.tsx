@@ -1,19 +1,19 @@
-import { useContext } from "react";
+import { memo, useCallback, useContext } from "react";
 import { MapContext, PlacesContext } from "../context";
+import { MAP_CONFIG } from "../constants/map.constants";
 
-export const BtnMyLocation = () => {
+export const BtnMyLocation = memo(() => {
   const { map, isMapReady } = useContext(MapContext);
   const { userLocation } = useContext(PlacesContext);
 
-  const onClick = () => {
-    if (!isMapReady) throw new Error("Map is not ready!");
-    if (!userLocation) throw new Error("User location not ready!");
+  const onClick = useCallback(() => {
+    if (!isMapReady || !userLocation || !map) return;
 
-    map?.flyTo({
-      zoom: 14,
+    map.flyTo({
+      zoom: MAP_CONFIG.FLY_TO_ZOOM,
       center: userLocation,
     });
-  };
+  }, [isMapReady, userLocation, map]);
 
   return (
     <button
@@ -29,4 +29,6 @@ export const BtnMyLocation = () => {
       Mi ubicación
     </button>
   );
-};
+});
+
+BtnMyLocation.displayName = 'BtnMyLocation';

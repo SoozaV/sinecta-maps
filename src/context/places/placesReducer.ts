@@ -1,9 +1,14 @@
 import { PlacesState } from "./PlacesProvider";
 
-type PlacesAction = {
-  type: "setUserLocation";
-  payload: [number, number];
-};
+type PlacesAction =
+  | {
+      type: "setUserLocation";
+      payload: [number, number];
+    }
+  | {
+      type: "setLoading";
+      payload: boolean;
+    };
 
 export const placesReducer = (
   state: PlacesState,
@@ -15,6 +20,11 @@ export const placesReducer = (
         ...state,
         isLoading: false,
         userLocation: action.payload,
+      };
+    case "setLoading":
+      return {
+        ...state,
+        isLoading: action.payload,
       };
     default:
       return state;

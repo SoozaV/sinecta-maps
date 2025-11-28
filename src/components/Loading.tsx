@@ -1,4 +1,6 @@
-export function Loading() {
+import { memo } from 'react';
+
+export const Loading = memo(() => {
   return (
     <div className="loading-map d-flex justify-content-center align-items-center">
       <div className="text-center">
@@ -7,4 +9,6 @@ export function Loading() {
       </div>
     </div>
   );
-}
+});
+
+Loading.displayName = 'Loading';

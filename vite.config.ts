@@ -16,6 +16,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true, // Escucha en todas las interfaces (IPv4 e IPv6)
     open: true,
   },
   build: {

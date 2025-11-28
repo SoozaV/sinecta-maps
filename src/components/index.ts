@@ -3,3 +3,4 @@ export { Polygons } from "./Polygons";
 export { Loading } from "./Loading";
 export { BtnMyLocation } from "./BtnMyLocation";
 export { ErrorBoundary } from "./ErrorBoundary";
+export { GlobalLoading } from "./GlobalLoading";

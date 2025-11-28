@@ -2,6 +2,7 @@ import { Map } from "mapbox-gl";
 import { useContext, useRef, useLayoutEffect, memo } from "react";
 import { PlacesContext, MapContext } from "../context";
 import { Loading } from "./";
+import { MAP_CONFIG } from "../constants/map.constants";
 
 export const MapView = memo(() => {
   const { isLoading, userLocation } = useContext(PlacesContext);
@@ -12,10 +13,12 @@ export const MapView = memo(() => {
     if (!isLoading) {
       const map = new Map({
         container: mapDiv.current!,
-        style: "mapbox://styles/mapbox/satellite-v9",
+        style: MAP_CONFIG.STYLE,
         center: userLocation,
-        zoom: 12,
+        zoom: MAP_CONFIG.DEFAULT_ZOOM,
+        collectResourceTiming: MAP_CONFIG.COLLECT_RESOURCE_TIMING,
       });
+
       setMap(map);
     }
   }, [isLoading]);
