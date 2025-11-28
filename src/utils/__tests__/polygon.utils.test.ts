@@ -5,6 +5,9 @@ import {
   calculatePolygonArea,
   formatArea,
   getPolygonBbox,
+  calculatePolygonPerimeter,
+  getVertexCount,
+  formatDistance,
 } from '../polygon.utils';
 import { createTestPolygon } from '../../setupTests';
 
@@ -106,6 +109,80 @@ describe('polygon.utils', () => {
       expect(bbox[1]).toBe(-1);
       expect(bbox[2]).toBe(1);
       expect(bbox[3]).toBe(1);
+    });
+  });
+
+  describe('calculatePolygonPerimeter', () => {
+    it('should calculate perimeter in meters', () => {
+      // Square polygon: 1 degree x 1 degree
+      const polygon = createTestPolygon([[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]);
+      const perimeter = calculatePolygonPerimeter(polygon);
+      
+      expect(perimeter).toBeGreaterThan(0);
+      expect(typeof perimeter).toBe('number');
+    });
+
+    it('should return 0 for degenerate polygons', () => {
+      const polygon = createTestPolygon([[[0, 0], [0, 0], [0, 0], [0, 0]]]);
+      const perimeter = calculatePolygonPerimeter(polygon);
+      
+      expect(perimeter).toBe(0);
+    });
+  });
+
+  describe('getVertexCount', () => {
+    it('should count vertices correctly', () => {
+      const polygon = createTestPolygon([[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]);
+      const count = getVertexCount(polygon);
+      
+      // 4 vertices (last point is duplicate of first)
+      expect(count).toBe(4);
+    });
+
+    it('should handle polygons with many vertices', () => {
+      const polygon = createTestPolygon([[
+        [0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [2, 1], [1, 1], [0, 1], [0, 0]
+      ]]);
+      const count = getVertexCount(polygon);
+      
+      expect(count).toBe(8);
+    });
+
+    it('should return 0 for invalid polygons', () => {
+      const polygon = createTestPolygon([[[0, 0], [0, 0]]]);
+      const count = getVertexCount(polygon);
+      
+      expect(count).toBe(0);
+    });
+  });
+
+  describe('formatDistance', () => {
+    it('should format meters for distances < 1000m', () => {
+      const formatted = formatDistance(500);
+      
+      expect(formatted).toContain('500');
+      expect(formatted).toContain(' m');
+      expect(formatted).not.toContain('km');
+    });
+
+    it('should format kilometers for distances >= 1000m', () => {
+      const formatted = formatDistance(1500);
+      
+      expect(formatted).toContain('1.5');
+      expect(formatted).toContain(' km');
+      expect(formatted).not.toContain(' m');
+    });
+
+    it('should handle large distances', () => {
+      const formatted = formatDistance(12345.67);
+      
+      expect(formatted).toContain('12,345.67');
+      expect(formatted).toContain(' km');
+    });
+
+    it('should handle zero', () => {
+      const formatted = formatDistance(0);
+      expect(formatted).toBe('0 m');
     });
   });
 });
