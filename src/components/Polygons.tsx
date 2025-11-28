@@ -1,4 +1,5 @@
 import { useEffect, useContext } from "react";
+import type MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { MapContext } from "../context";
 import { usePolygonsStore } from "../stores/usePolygonsStore";
 import { usePolygonSelection } from "../hooks/usePolygonSelection";
@@ -15,7 +16,7 @@ export const Polygons = () => {
   const { createPolygon, deletePolygon } = usePolygonOperations();
   const { centerPolygon } = usePolygonViewport();
 
-  const handleDrawCreate = async (e: any) => {
+  const handleDrawCreate = async (e: MapboxDraw.DrawCreateEvent) => {
     const newPolygon = e.features[0] as GeoJSON.Feature<GeoJSON.Polygon>;
     
     try {

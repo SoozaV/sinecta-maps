@@ -1,4 +1,4 @@
-import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosError } from "axios";
 import { useGlobalStore } from "../stores/useGlobalStore";
 
 /**
@@ -30,8 +30,9 @@ export function setupLoadingInterceptor(axiosInstance: AxiosInstance) {
       return response;
     },
     (error: unknown) => {
-      const config = (error as any)?.config;
-      if (!config?.ignoreLoading) {
+      // Type narrowing: Axios interceptors always receive AxiosError in response error handler
+      const axiosError = error as AxiosError;
+      if (!axiosError.config?.ignoreLoading) {
         useGlobalStore.getState().stopLoading();
       }
       return Promise.reject(error);

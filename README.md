@@ -1,6 +1,6 @@
 # 🗺️ Sinecta Maps
 
-[![CI](https://github.com/USERNAME/sinecta-maps/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/sinecta-maps/actions/workflows/ci.yml)
+[![CI](https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://reactjs.org/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black.svg)](https://sinecta-maps.vercel.app/)
@@ -31,7 +31,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/USERNAME/sinecta-maps.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps.git
 cd sinecta-maps/sinecta-maps-frontend
 
 # Install dependencies
@@ -182,8 +182,8 @@ This project is licensed under the MIT License.
 
 ## 👤 Author
 
-[Your Name](https://github.com/USERNAME)
+[Your Name](https://github.com/YOUR_GITHUB_USERNAME)
 
 ---
 
-**Note**: Replace `USERNAME` in badges and links with your actual GitHub username.
+**Note**: Replace `YOUR_GITHUB_USERNAME` in badges and links (lines 3, 34, 185) with your actual GitHub username.

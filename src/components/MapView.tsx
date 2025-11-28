@@ -8,20 +8,33 @@ export const MapView = memo(() => {
   const { isLoading, userLocation } = useContext(PlacesContext);
   const { setMap } = useContext(MapContext);
   const mapDiv = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
 
   useLayoutEffect(() => {
-    if (!isLoading) {
-      const map = new Map({
-        container: mapDiv.current!,
-        style: MAP_CONFIG.STYLE,
-        center: userLocation,
-        zoom: MAP_CONFIG.DEFAULT_ZOOM,
-        collectResourceTiming: MAP_CONFIG.COLLECT_RESOURCE_TIMING,
-      });
+    // Only initialize map once when loading finishes
+    if (isLoading || initialized.current) return;
+    if (!mapDiv.current) return;
 
-      setMap(map);
-    }
-  }, [isLoading]);
+    const map = new Map({
+      container: mapDiv.current,
+      style: MAP_CONFIG.STYLE,
+      center: userLocation,
+      zoom: MAP_CONFIG.DEFAULT_ZOOM,
+      collectResourceTiming: MAP_CONFIG.COLLECT_RESOURCE_TIMING,
+    });
+
+    setMap(map);
+    initialized.current = true;
+
+    // Cleanup: destroy map on unmount
+    return () => {
+      try {
+        map.remove();
+      } catch {
+        // Ignore errors during cleanup
+      }
+    };
+  }, [isLoading, setMap, userLocation]);
 
   if (isLoading) {
     return <Loading />;

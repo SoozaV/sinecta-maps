@@ -6,7 +6,8 @@
 /**
  * Validates if data is a valid GeoJSON FeatureCollection
  */
-export function validateGeoJSON(data: any): data is GeoJSON.FeatureCollection {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function validateGeoJSON(data: any): data is GeoJSON.FeatureCollection { // Type guard requires any
   if (!data || typeof data !== 'object') {
     return false;
   }

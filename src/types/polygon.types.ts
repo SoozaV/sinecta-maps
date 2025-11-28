@@ -3,7 +3,8 @@ export interface PolygonProperties {
   name?: string;
   area?: number;
   place_name?: string;
-  [key: string]: any;
+  // Allow additional dynamic properties (GeoJSON spec allows arbitrary properties)
+  [key: string]: unknown;
 }
 
 export interface PolygonFeature extends GeoJSON.Feature<GeoJSON.Polygon> {

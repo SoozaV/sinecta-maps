@@ -16,9 +16,6 @@ export default defineConfig({
         'node_modules/',
         'src/setupTests.ts',
         '**/*.d.ts',
-        '**/*.config.*',
-        '**/mockData/**',
-        'dist/',
       ],
       thresholds: {
         lines: 70,

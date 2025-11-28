@@ -40,13 +40,17 @@ src/
 │       ├── PlacesProvider.tsx
 │       └── placesReducer.ts
 ├── utils/                # Pure utility functions
-│   ├── polygon.utils.ts  # Polygon calculations (area, bbox, etc.)
+│   ├── polygon.utils.ts  # Polygon calculations (area, perimeter, vertices, bbox, etc.)
 │   └── errorHandler.ts  # Error handling utilities
 ├── services/             # Service layer
 │   └── geojson.service.ts # GeoJSON export/import
 ├── apis/                 # API clients
-│   ├── polygonsApi.ts    # Backend API client
-│   └── geocodingApi.ts   # Mapbox Geocoding API
+│   ├── polygonsApi.ts    # Backend API client (uses VITE_BASE_URL)
+│   └── geocodingApi.ts   # Mapbox Geocoding API (uses VITE_MAPBOX_GEOCODING_TOKEN or fallback)
+├── interceptors/         # Axios interceptors
+│   ├── error.interceptor.ts    # Error handling and online/offline state
+│   ├── loading.interceptor.ts  # Global loading state management
+│   └── index.ts
 ├── types/                # TypeScript type definitions
 │   └── polygon.types.ts
 ├── constants/            # Configuration constants
@@ -82,15 +86,35 @@ Container component for the Mapbox GL map instance.
 - Provide map instance to MapContext
 - Handle map lifecycle (mount/unmount)
 
+### ErrorBoundary.tsx
+
+React Error Boundary component for catching and handling React errors.
+
+**Responsibilities:**
+- Catch JavaScript errors in child components
+- Display fallback UI when errors occur
+- Log errors to console for debugging
+- Prevent entire app crash from component errors
+
+**Usage:**
+- Wraps entire app in `MapsApp.tsx`
+- Can accept custom `fallback` prop for custom error UI
+
 ### PolygonListItem.tsx
 
 Individual polygon item in the list.
 
 **Responsibilities:**
-- Display polygon name, address, and area
+- Display polygon name, address, and metrics (area, perimeter, vertices)
+- Calculate metrics using useMemo for performance
 - Handle selection click
 - Handle delete action
 - Show active state styling
+
+**Metrics Displayed:**
+- Area: Formatted in m²
+- Perimeter: Formatted in m or km (auto-conversion)
+- Vertices: Count of polygon vertices
 
 ### GeoJSONControls.tsx
 
@@ -101,6 +125,28 @@ Export/Import controls for GeoJSON persistence.
 - Import GeoJSON file and replace polygons
 - Provide user feedback (success/error messages)
 - Update map with imported polygons
+- Uses `replacePolygons` from `usePolygonsStore` to replace all polygons
+
+## Utility Functions
+
+### polygon.utils.ts
+
+Pure functions for polygon calculations and formatting.
+
+**Functions:**
+- `getPolygonCoords()`: Extract coordinates from polygon feature
+- `getPolygonCenter()`: Calculate centroid using Turf.js
+- `calculatePolygonArea()`: Calculate area in square meters
+- `formatArea()`: Format area with locale (e.g., "1,234.56m²")
+- `getPolygonBbox()`: Calculate bounding box
+- `calculatePolygonPerimeter()`: Calculate perimeter in meters using `@turf/length`
+- `getVertexCount()`: Count vertices in polygon (excluding closing point)
+- `formatDistance()`: Format distance in m or km (auto-conversion at 1000m)
+
+**Dependencies:**
+- `@turf/turf`: Main Turf.js library
+- `@turf/length`: For perimeter calculation
+- `@turf/helpers`: For `lineString` helper
 
 ## Custom Hooks
 
@@ -170,15 +216,19 @@ Handles map and draw plugin events.
 - Polygon operations (create, update, delete, replace)
 - Automatic area calculation
 - Geocoding integration for addresses
+- `replacePolygons()`: Replace entire FeatureCollection (used for GeoJSON import)
 
 **useGlobalStore:**
-- Loading states
-- Online/offline status
-- Global app configuration
+- Loading states (with counter for multiple concurrent requests)
+- Online/offline status tracking
+- Offline message management
+- Methods: `startLoading()`, `stopLoading()`, `setOnline()`, `setOffline()`
+- Optimized selectors: `selectIsLoading`, `selectIsOnline`, `selectOfflineMessage`
 
 **Optimization:**
 - Uses selectors to prevent unnecessary re-renders
 - Granular subscriptions (components only subscribe to needed data)
+- Loading counter prevents flickering when multiple requests occur
 
 ### React Context
 
@@ -294,15 +344,40 @@ DELETE /api/polygons/:id       # Delete polygon
 ## Error Handling
 
 ### Strategy
-- **User-facing**: Toast/alert messages for user actions
+- **User-facing**: Console errors (toast system can be integrated in future)
 - **Developer-facing**: Console errors with context
 - **Graceful Degradation**: App continues working if backend unavailable
+- **Error Boundary**: Catches React component errors
 
 ### Error Types
-- **API Errors**: Handled by `errorHandler.ts` (AppError class)
-- **Network Errors**: Detected and handled gracefully
+- **API Errors**: Handled by `errorHandler.ts` (AppError class) and `error.interceptor.ts`
+- **Network Errors**: Detected by interceptors, tracked in `useGlobalStore`
 - **Validation Errors**: GeoJSON validation before import
 - **Map Errors**: Mapbox errors logged, app continues
+- **React Errors**: Caught by `ErrorBoundary` component
+
+### Axios Interceptors
+
+**Error Interceptor** (`error.interceptor.ts`):
+- Handles HTTP error responses (400, 401, 403, 404, 500, etc.)
+- Tracks online/offline state in `useGlobalStore`
+- Supports flags:
+  - `ignoreErrorMessage`: Suppress automatic error messages (for optimistic updates)
+  - `showOfflineBanner`: Show offline banner for network errors
+- Maps HTTP status codes to user-friendly messages
+- Logs errors in development mode
+
+**Loading Interceptor** (`loading.interceptor.ts`):
+- Manages global loading state via `useGlobalStore`
+- Uses counter to handle multiple concurrent requests
+- Supports flag:
+  - `ignoreLoading`: Skip loading state for specific requests
+- Prevents loading flicker when multiple requests occur simultaneously
+
+**Interceptor Setup:**
+- Interceptors are configured in `polygonsApi.ts`
+- Order: `setupLoadingInterceptor` first, then `setupErrorInterceptor`
+- Both interceptors extend Axios types to support custom flags
 
 ## Dependencies
 
@@ -339,8 +414,23 @@ DELETE /api/polygons/:id       # Delete polygon
 - Deployed to Vercel (auto-deploy on push to main)
 
 ### Environment Variables
-- `VITE_MAPBOX_ACCESS_TOKEN`: Required for map rendering
-- `VITE_MAPBOX_GEOCODING_TOKEN`: Optional, for geocoding
+- `VITE_MAPBOX_ACCESS_TOKEN`: Required for map rendering (used in `src/index.tsx`)
+  - Public token (starts with `pk.`)
+  - Used to initialize Mapbox GL JS
+- `VITE_MAPBOX_GEOCODING_TOKEN`: Optional, for geocoding API (fallback to `VITE_MAPBOX_ACCESS_TOKEN` if not set)
+  - Used in `src/apis/geocodingApi.ts` for reverse geocoding (address lookup)
+  - Allows separate token management for better monitoring and security
+- `VITE_BASE_URL`: Backend API base URL (used in `src/apis/polygonsApi.ts`)
+  - Currently points to backend (may be outdated)
+  - Used for all polygon CRUD operations
+  - Note: App gracefully handles backend unavailability
+
+### Mapbox Telemetry Blocking
+
+In `src/index.tsx`, Mapbox telemetry events are blocked:
+- Intercepts `window.fetch` calls to `events.mapbox.com`
+- Prevents automatic telemetry data collection
+- Improves privacy and reduces unnecessary network requests
 
 ## Security Considerations
 

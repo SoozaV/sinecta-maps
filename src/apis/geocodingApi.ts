@@ -7,7 +7,8 @@ const geocodingApi = axios.create({
   params: {
     limit: 1,
     types: "place,postcode,address",
-    access_token: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
+    // Use dedicated geocoding token if available, otherwise fallback to main access token
+    access_token: import.meta.env.VITE_MAPBOX_GEOCODING_TOKEN || import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
   },
 });
 

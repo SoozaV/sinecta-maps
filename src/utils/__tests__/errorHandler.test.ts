@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { AxiosError } from 'axios';
 import { AppError, handleApiError } from '../errorHandler';
 
 describe('errorHandler', () => {
@@ -23,15 +24,20 @@ describe('errorHandler', () => {
   });
 
   describe('handleApiError', () => {
-    it('should handle API response errors', () => {
-      const mockError = {
-        response: {
+    it('should handle AxiosError with response', () => {
+      const mockError = new AxiosError(
+        'Bad request',
+        'ERR_BAD_REQUEST',
+        undefined,
+        undefined,
+        {
           status: 400,
-          data: {
-            message: 'Bad request',
-          },
-        },
-      };
+          statusText: 'Bad Request',
+          data: { message: 'Bad request' },
+          headers: {},
+          config: {} as never,
+        }
+      );
       
       const error = handleApiError(mockError);
       
@@ -41,13 +47,20 @@ describe('errorHandler', () => {
       expect(error.statusCode).toBe(400);
     });
 
-    it('should handle API errors without message in response data', () => {
-      const mockError = {
-        response: {
+    it('should handle AxiosError without message in response data', () => {
+      const mockError = new AxiosError(
+        'Server error',
+        'ERR_SERVER_ERROR',
+        undefined,
+        undefined,
+        {
           status: 500,
+          statusText: 'Internal Server Error',
           data: {},
-        },
-      };
+          headers: {},
+          config: {} as never,
+        }
+      );
       
       const error = handleApiError(mockError);
       
@@ -56,10 +69,13 @@ describe('errorHandler', () => {
       expect(error.statusCode).toBe(500);
     });
 
-    it('should handle network errors', () => {
-      const mockError = {
-        request: {},
-      };
+    it('should handle AxiosError with request but no response (network error)', () => {
+      const mockError = new AxiosError(
+        'Network error',
+        'ERR_NETWORK',
+        undefined,
+        {} as never
+      );
       
       const error = handleApiError(mockError);
       
@@ -69,10 +85,8 @@ describe('errorHandler', () => {
       expect(error.statusCode).toBeUndefined();
     });
 
-    it('should handle unknown errors', () => {
-      const mockError = {
-        message: 'Unknown error occurred',
-      };
+    it('should handle standard Error', () => {
+      const mockError = new Error('Unknown error occurred');
       
       const error = handleApiError(mockError);
       
@@ -82,8 +96,8 @@ describe('errorHandler', () => {
       expect(error.statusCode).toBeUndefined();
     });
 
-    it('should handle errors without message', () => {
-      const mockError = {};
+    it('should handle non-Error objects', () => {
+      const mockError = { someProperty: 'value' };
       
       const error = handleApiError(mockError);
       
