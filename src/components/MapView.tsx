@@ -1,9 +1,9 @@
 import { Map } from "mapbox-gl";
-import { useContext, useRef, useLayoutEffect } from "react";
+import { useContext, useRef, useLayoutEffect, memo } from "react";
 import { PlacesContext, MapContext } from "../context";
 import { Loading } from "./";
 
-export const MapView = () => {
+export const MapView = memo(() => {
   const { isLoading, userLocation } = useContext(PlacesContext);
   const { setMap } = useContext(MapContext);
   const mapDiv = useRef<HTMLDivElement>(null);
@@ -24,4 +24,6 @@ export const MapView = () => {
     return <Loading />;
   }
   return <div ref={mapDiv} className="" style={{position: "absolute", top: 0, bottom: 0, width: "100%"}}></div>;
-};
+});
+
+MapView.displayName = 'MapView';

@@ -1,5 +1,6 @@
-import { MapProvider, PlacesProvider, PolygonsProvider } from "./context";
+import { MapProvider, PlacesProvider } from "./context";
 import { HomeScreen } from "./screens";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import "./styles.css";
 //import "mapbox-gl/dist/mapbox-gl.css";
@@ -7,12 +8,12 @@ import "./styles.css";
 
 export default function MapsApp() {
   return (
-    <PlacesProvider>
-      <MapProvider>
-        <PolygonsProvider>
+    <ErrorBoundary>
+      <PlacesProvider>
+        <MapProvider>
           <HomeScreen />
-        </PolygonsProvider>
-      </MapProvider>
-    </PlacesProvider>
+        </MapProvider>
+      </PlacesProvider>
+    </ErrorBoundary>
   );
 }

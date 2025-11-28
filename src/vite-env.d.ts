@@ -1,0 +1,18 @@
+/// <reference types="vite/client" />
+/// <reference types="vite-plugin-svgr/client" />
+
+declare module '*.svg?react' {
+  import * as React from 'react';
+  const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  export default ReactComponent;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_MAPBOX_ACCESS_TOKEN: string;
+  readonly VITE_BASE_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+

@@ -6,13 +6,13 @@ import {
   useRef,
 } from "react";
 import { MapContext } from "../context";
-import { PolygonsContext } from "../context/polygons/PolygonsContext";
+import { usePolygonsStore } from "../stores/usePolygonsStore";
 
 import { polygon, bbox } from "turf";
 
-import { ReactComponent as Marker } from "../images/marker.svg";
-import { ReactComponent as Trash } from "../images/waste-basket.svg";
-import { ReactComponent as Add } from "../images/hospital.svg";
+import Marker from "../images/marker.svg?react";
+import Trash from "../images/waste-basket.svg?react";
+import Add from "../images/hospital.svg?react";
 import { LngLatBoundsLike } from "mapbox-gl";
 import polygonsApi from "../apis/polygonsApi";
 
@@ -37,7 +37,7 @@ export const Polygons = () => {
     updatePolygonProperties,
     updatePolygonsArray,
     deletePolygonFromArray,
-  } = useContext(PolygonsContext);
+  } = usePolygonsStore();
 
   const centerPolygonOnMap = () => {
     let coords = JSON.parse(JSON.stringify(activePolygon.feature?.geometry));
@@ -92,54 +92,59 @@ export const Polygons = () => {
   }, [activePolygon]);
 
   useLayoutEffect(() => {
-    map?.on("load", async () => {
+    if (!isMapReady || !map || !draw) return;
+
+    const handleMapLoad = async () => {
       try {
-        await polygonsApi.get("/api/polygons").then(({ data }) => {
-          const fc = data.data[0][0]
-            .json_build_object as GeoJSON.FeatureCollection;
-          if (!fc.features.length)
-            throw new Error("Agrega tu primer polígono!");
-          fc.features.map((feature) => (feature.id = feature.properties?.id));
-          if (isMapReady && draw) {
-            draw.set(fc);
-            loadFirstPolygons(fc);
-          }
-        });
+        await loadFirstPolygons();
+        const loadedPolygons = usePolygonsStore.getState().polygons;
+        if (loadedPolygons.features.length > 0) {
+          draw.set(loadedPolygons);
+        }
       } catch (error) {
         error instanceof Error
           ? console.log("Add your first Polygon!")
           : console.log(error);
       }
-    });
+    };
 
-    if (isMapReady) {
-      map
-        ?.on("click", () => {
-          const selectedPolygonId = draw?.getSelectedIds()[0];
-          const selectedPolygon = draw?.get(selectedPolygonId as string);
-          const selectedPolygonIndex = getListElementIndex(
-            selectedPolygon?.id as string
-          );
-          if (selectedPolygonId) {
-            setActivePolygon({
-              feature: selectedPolygon,
-              index: selectedPolygonIndex,
-              polygonId: selectedPolygonId,
-            });
-          }
-        })
-        .on("draw.create", async (e) => {
-          let newPolygon = e.features[0] as GeoJSON.Feature<GeoJSON.Polygon>;
-          newPolygon = updatePolygonProperties(newPolygon);
-          await polygonsApi
-            .post("/api/polygons", newPolygon)
-            .then(({ data }) => {
-              const newPolygon = data.data as GeoJSON.Feature<GeoJSON.Polygon>;
-              updatePolygonsArray(newPolygon);
-            });
+    const handleMapClick = () => {
+      const selectedPolygonId = draw.getSelectedIds()[0];
+      const selectedPolygon = draw.get(selectedPolygonId as string);
+      const selectedPolygonIndex = getListElementIndex(
+        selectedPolygon?.id as string
+      );
+      if (selectedPolygonId) {
+        setActivePolygon({
+          feature: selectedPolygon,
+          index: selectedPolygonIndex,
+          polygonId: selectedPolygonId,
         });
-    }
-  }, [isMapReady, listRef, polygons, map]);
+      }
+    };
+
+    const handleDrawCreate = async (e: any) => {
+      let newPolygon = e.features[0] as GeoJSON.Feature<GeoJSON.Polygon>;
+      newPolygon = updatePolygonProperties(newPolygon);
+      try {
+        const { data } = await polygonsApi.post("/api/polygons", newPolygon);
+        const createdPolygon = data.data as GeoJSON.Feature<GeoJSON.Polygon>;
+        updatePolygonsArray(createdPolygon);
+      } catch (error) {
+        console.error("Error creating polygon:", error);
+      }
+    };
+
+    map.on("load", handleMapLoad);
+    map.on("click", handleMapClick);
+    map.on("draw.create", handleDrawCreate);
+
+    return () => {
+      map.off("load", handleMapLoad);
+      map.off("click", handleMapClick);
+      map.off("draw.create", handleDrawCreate);
+    };
+  }, [isMapReady, map, draw, loadFirstPolygons, updatePolygonProperties, updatePolygonsArray]);
 
   return (
     <>
@@ -181,7 +186,9 @@ export const Polygons = () => {
         {polygons?.features.length ?
           polygons.features.map((polygon, index) => (
             <li
-              ref={(el) => (listItemRef.current[index] = el as HTMLLIElement)}
+              ref={(el) => {
+                if (el) listItemRef.current[index] = el;
+              }}
               onClick={() => {
                 setActivePolygon({
                   feature: polygon,
