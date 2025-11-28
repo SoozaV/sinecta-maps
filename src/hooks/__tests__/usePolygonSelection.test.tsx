@@ -18,7 +18,7 @@ vi.mock('../../stores/usePolygonsStore', () => ({
 
 describe('usePolygonSelection', () => {
   const mockDraw = {
-    getSelectedIds: vi.fn(() => []),
+    getSelectedIds: vi.fn<() => string[]>(() => []),
     get: vi.fn(),
   };
 

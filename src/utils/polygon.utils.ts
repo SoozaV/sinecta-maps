@@ -1,4 +1,6 @@
 import * as turf from '@turf/turf';
+import length from '@turf/length';
+import { lineString } from '@turf/helpers';
 
 export const getPolygonCoords = (polygon: GeoJSON.Feature) => {
   const coords = JSON.parse(JSON.stringify(polygon.geometry));
@@ -23,23 +25,17 @@ export const getPolygonBbox = (polygon: GeoJSON.Feature<GeoJSON.Polygon>) => {
 
 /**
  * Calculates the perimeter of a polygon in meters
+ * Uses turf.length() to calculate the length of the polygon's outer ring as a LineString
  */
 export const calculatePolygonPerimeter = (polygon: GeoJSON.Feature<GeoJSON.Polygon>): number => {
   const coords = getPolygonCoords(polygon);
-  const polygonFeature = turf.polygon(coords);
+  const outerRing = coords[0];
   
-  // Calculate perimeter by summing distances between consecutive points
-  let perimeter = 0;
-  const outerRing = polygonFeature.geometry.coordinates[0];
+  // Convert the outer ring to a LineString
+  const line = lineString(outerRing);
   
-  for (let i = 0; i < outerRing.length - 1; i++) {
-    const point1 = turf.point(outerRing[i]);
-    const point2 = turf.point(outerRing[i + 1]);
-    const distance = turf.distance(point1, point2, { units: 'meters' });
-    perimeter += distance;
-  }
-  
-  return perimeter;
+  // Calculate the length (perimeter) in meters
+  return length(line, { units: 'meters' });
 };
 
 /**

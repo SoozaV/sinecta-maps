@@ -56,7 +56,7 @@ const setPolygonArea = (polygon: GeoJSON.Feature<GeoJSON.Polygon>) => {
   };
 };
 
-export const usePolygonsStore = create<PolygonsState>((set, get) => ({
+export const usePolygonsStore = create<PolygonsState>((set) => ({
   polygons: {
     type: 'FeatureCollection',
     features: [],
@@ -171,7 +171,7 @@ export const usePolygonsStore = create<PolygonsState>((set, get) => ({
     }
   },
 
-  deletePolygonFromArray: (polygon: GeoJSON.Feature, index: number) => {
+  deletePolygonFromArray: (_polygon: GeoJSON.Feature, index: number) => {
     set((state) => ({
       polygons: {
         ...state.polygons,

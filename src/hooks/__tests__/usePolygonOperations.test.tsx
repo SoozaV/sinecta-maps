@@ -22,19 +22,25 @@ const mockUpdatePolygonProperties = vi.fn((polygon) => ({
 const mockUpdatePolygonsArray = vi.fn();
 const mockDeletePolygonFromArray = vi.fn();
 
+const mockState = {
+  updatePolygonProperties: mockUpdatePolygonProperties,
+  updatePolygonsArray: mockUpdatePolygonsArray,
+  deletePolygonFromArray: mockDeletePolygonFromArray,
+  polygons: {
+    type: 'FeatureCollection' as const,
+    features: [],
+  },
+};
+
 vi.mock('../../stores/usePolygonsStore', () => ({
-  usePolygonsStore: vi.fn((selector) => {
-    const state = {
-      updatePolygonProperties: mockUpdatePolygonProperties,
-      updatePolygonsArray: mockUpdatePolygonsArray,
-      deletePolygonFromArray: mockDeletePolygonFromArray,
-      polygons: {
-        type: 'FeatureCollection' as const,
-        features: [],
-      },
-    };
-    return selector ? selector(state) : state;
-  }),
+  usePolygonsStore: Object.assign(
+    vi.fn((selector) => {
+      return selector ? selector(mockState) : mockState;
+    }),
+    {
+      getState: () => mockState,
+    }
+  ),
 }));
 
 describe('usePolygonOperations', () => {
@@ -69,9 +75,8 @@ describe('usePolygonOperations', () => {
 
       const { result } = renderHook(() => usePolygonOperations(), { wrapper });
 
-      let createdPolygon: any;
       await act(async () => {
-        createdPolygon = await result.current.createPolygon(polygon);
+        await result.current.createPolygon(polygon);
       });
 
       expect(mockUpdatePolygonProperties).toHaveBeenCalledWith(polygon);

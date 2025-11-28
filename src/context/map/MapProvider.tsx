@@ -1,4 +1,4 @@
-import { useReducer, ReactNode } from "react";
+import { useReducer, ReactNode, useRef, useMemo } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import { MapContext } from "./MapContext";
 import { mapReducer } from "./mapReducer";
@@ -15,19 +15,32 @@ type Props = {
   children: ReactNode;
 };
 
-const draw = new MapboxDraw(MAP_CONTROLS.DRAW);
-
 const INITIAL_STATE: MapState = {
   isMapReady: false,
-  draw,
+  draw: undefined,
   map: undefined,
 };
 
 export const MapProvider = ({ children }: Props) => {
-  const [state, dispatch] = useReducer(mapReducer, INITIAL_STATE);
+  // Initialize MapboxDraw once and keep reference across re-renders
+  const drawRef = useRef<MapboxDraw | undefined>(undefined);
+  
+  if (!drawRef.current) {
+    drawRef.current = new MapboxDraw(MAP_CONTROLS.DRAW);
+  }
+
+  // Initialize state with draw instance
+  const initialState = useMemo(() => ({
+    ...INITIAL_STATE,
+    draw: drawRef.current,
+  }), []);
+
+  const [state, dispatch] = useReducer(mapReducer, initialState);
 
   const setMap = (map: Map) => {
-    map.addControl(draw);
+    if (drawRef.current) {
+      map.addControl(drawRef.current);
+    }
     map.addControl(new mapboxgl.NavigationControl(), MAP_CONTROLS.NAVIGATION.position);
     dispatch({ type: "setMap", payload: map });
   };

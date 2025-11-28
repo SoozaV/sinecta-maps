@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PolygonListItem } from '../PolygonList/PolygonListItem';
 import { createTestPolygon } from '../../setupTests';
@@ -42,7 +42,7 @@ describe('PolygonListItem', () => {
 
     render(<PolygonListItem {...defaultProps} polygon={polygon} />);
 
-    const areaText = screen.getByText(/Area:/);
+    const areaText = screen.getByText(/📐 Área:/);
     expect(areaText).toBeInTheDocument();
     expect(areaText.textContent).toContain('1,234.56');
     expect(areaText.textContent).toContain('m²');
@@ -69,7 +69,6 @@ describe('PolygonListItem', () => {
   it('should stop propagation when delete button is clicked', () => {
     render(<PolygonListItem {...defaultProps} />);
 
-    const listItem = screen.getByRole('listitem');
     const deleteButton = screen.getByRole('button');
     
     const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });

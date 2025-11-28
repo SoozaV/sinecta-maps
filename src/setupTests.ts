@@ -44,8 +44,8 @@ vi.mock('mapbox-gl', () => ({
 }));
 
 // Mock Mapbox Draw
-vi.mock('@mapbox/mapbox-gl-draw', () => ({
-  default: vi.fn().mockImplementation(() => ({
+vi.mock('@mapbox/mapbox-gl-draw', () => {
+  const MockMapboxDraw = vi.fn().mockImplementation(() => ({
     add: vi.fn(),
     delete: vi.fn(),
     get: vi.fn(),
@@ -58,7 +58,36 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
     changeMode: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
-  })),
+  }));
+  
+  return {
+    default: MockMapboxDraw,
+    __esModule: true,
+  };
+});
+
+// Mock map constants
+vi.mock('./constants/map.constants', () => ({
+  MAP_CONFIG: {
+    STYLE: 'mapbox://styles/mapbox/satellite-v9',
+    DEFAULT_ZOOM: 12,
+    FLY_TO_ZOOM: 14,
+    POLYGON_FIT_PADDING: 50,
+    COLLECT_RESOURCE_TIMING: false,
+  },
+  MAP_CONTROLS: {
+    NAVIGATION: {
+      position: 'top-left',
+    },
+    DRAW: {
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: false,
+      },
+    },
+  },
+  DEFAULT_LOCATION: [-99.1332, 19.4326],
 }));
 
 // Helper function to create test GeoJSON features
