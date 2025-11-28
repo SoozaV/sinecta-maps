@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import Marker from "../../images/marker.svg?react";
 import Trash from "../../images/waste-basket.svg?react";
+import { calculatePolygonPerimeter, getVertexCount, formatArea, formatDistance } from "../../utils/polygon.utils";
 
 interface PolygonListItemProps {
   polygon: GeoJSON.Feature;
@@ -16,6 +17,18 @@ export const PolygonListItem = memo(({ polygon, index, isActive, onSelect, onDel
     onDelete();
   };
 
+  const metrics = useMemo(() => {
+    const area = polygon.properties?.area || 0;
+    const perimeter = calculatePolygonPerimeter(polygon as GeoJSON.Feature<GeoJSON.Polygon>);
+    const vertexCount = getVertexCount(polygon as GeoJSON.Feature<GeoJSON.Polygon>);
+    
+    return {
+      area: formatArea(area),
+      perimeter: formatDistance(perimeter),
+      vertexCount,
+    };
+  }, [polygon]);
+
   return (
     <li
       onClick={onSelect}
@@ -29,8 +42,10 @@ export const PolygonListItem = memo(({ polygon, index, isActive, onSelect, onDel
       <div className="px-3" style={{ flex: 1, minWidth: 0 }}>
         <div>{polygon.properties?.name}</div>
         <div className="text-truncate">{polygon.properties?.place_name}</div>
-        <div className="font-weight-bold" style={{ fontSize: "12px", color: "#575757" }}>
-          Area: {polygon.properties?.area.toLocaleString(undefined, { maximumFractionDigits: 2 })}m²
+        <div className="polygon-metrics" style={{ fontSize: "12px", color: "#575757", display: "flex", flexDirection: "column", gap: "2px", marginTop: "4px" }}>
+          <span className="font-weight-bold">📐 Área: {metrics.area}</span>
+          <span>📏 Perímetro: {metrics.perimeter}</span>
+          <span>📍 Vértices: {metrics.vertexCount}</span>
         </div>
       </div>
       <div>
