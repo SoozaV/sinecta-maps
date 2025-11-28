@@ -12,6 +12,7 @@ interface PolygonsState {
   updatePolygonsArray: (polygon: GeoJSON.Feature<GeoJSON.Polygon>) => void;
   loadFirstPolygons: () => Promise<void>;
   deletePolygonFromArray: (polygon: GeoJSON.Feature, index: number) => void;
+  replacePolygons: (featureCollection: GeoJSON.FeatureCollection) => void;
 }
 
 const getPolygonCoords = (polygon: GeoJSON.Feature) => {
@@ -177,6 +178,12 @@ export const usePolygonsStore = create<PolygonsState>((set, get) => ({
         features: state.polygons.features.filter((_, i) => i !== index),
       },
     }));
+  },
+
+  replacePolygons: (featureCollection: GeoJSON.FeatureCollection) => {
+    set({
+      polygons: featureCollection,
+    });
   },
 }));
 

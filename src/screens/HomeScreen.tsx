@@ -1,4 +1,5 @@
 import { MapView, Polygons } from "../components";
+import { GeoJSONControls } from "../components/GeoJSONControls";
 import SinectaLogo from "../components/SinectaLogo";
 
 export const HomeScreen = () => {
@@ -7,9 +8,12 @@ export const HomeScreen = () => {
       <div className="row flex-column flex-md-row polygons-row">
         <aside
           className="col col-md-4 py-3 polygons-sidebar"
-          style={{ maxHeight: "100vh" }}
+          style={{ maxHeight: "100vh", display: "flex", flexDirection: "column" }}
         >
-          <Polygons />
+          <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <Polygons />
+          </div>
+          <GeoJSONControls />
         </aside>
         <div className="loaded-map col col-md-8 p-0">
           <MapView />
