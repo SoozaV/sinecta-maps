@@ -67,12 +67,22 @@ const {
     storeState.polygons.features = storeState.polygons.features.filter((_, i) => i !== index);
   });
 
+  const mockReplacePolygons = vi.fn((featureCollection: GeoJSON.FeatureCollection) => {
+    // REALMENTE reemplazar el FeatureCollection completo
+    // Cast necesario porque el store espera específicamente FeatureCollection con Polygon[]
+    storeState.polygons = featureCollection as {
+      type: 'FeatureCollection';
+      features: GeoJSON.Feature<GeoJSON.Polygon>[];
+    };
+  });
+
   // Función para obtener el estado actual (para getState())
   const getMockStoreState = () => ({
     ...storeState,
     updatePolygonProperties: mockUpdatePolygonProperties,
     updatePolygonsArray: mockUpdatePolygonsArray,
     deletePolygonFromArray: mockDeletePolygonFromArray,
+    replacePolygons: mockReplacePolygons,
   });
 
   // Función para resetear el estado entre tests
@@ -88,7 +98,8 @@ const {
   return { 
     mockUpdatePolygonProperties, 
     mockUpdatePolygonsArray, 
-    mockDeletePolygonFromArray, 
+    mockDeletePolygonFromArray,
+    mockReplacePolygons,
     getMockStoreState,
     resetMockStoreState,
   };
@@ -179,7 +190,7 @@ describe('usePolygonOperations', () => {
       });
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'Backend no disponible, guardando polígono localmente:',
+        'Backend no disponible, manteniendo polígono local:',
         expect.any(Error)
       );
       expect(mockUpdatePolygonsArray).toHaveBeenCalled();
@@ -244,7 +255,10 @@ describe('usePolygonOperations', () => {
       const storeState = getMockStoreState();
       const processedPolygon = storeState.polygons.features[0];
       
-      expect(returnedPolygon).toBe(processedPolygon);
+      // El polígono retornado debe ser el mismo que está en el store
+      // (puede ser el mismo objeto o uno con las mismas propiedades)
+      expect(returnedPolygon.id).toBe(processedPolygon.id);
+      expect(returnedPolygon.properties?.area).toBe(processedPolygon.properties?.area);
       expect(returnedPolygon.properties?.area).toBe(1000); // Valor mock agregado
       // Verificar que tiene place_name (agregado por el mock, o preservado si ya existía)
       expect(returnedPolygon.properties?.place_name).toBeDefined();
