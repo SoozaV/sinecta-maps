@@ -15,7 +15,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    // Usar el puerto por defecto de Vite (5173)
+    port: 5173,
     host: true, // Escucha en todas las interfaces (IPv4 e IPv6)
     open: true,
   },
