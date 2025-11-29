@@ -133,13 +133,12 @@ describe('geojson.service', () => {
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
     });
 
-    // Note: exportToFile does not validate data before export
-    // This allows exporting even invalid data for debugging purposes
-    // Validation should happen before calling exportToFile
-    it.skip('should throw error on export failure', () => {
-      const invalidFC = null as any;
+    it('should throw error on export failure', () => {
+      // Crear un objeto circular que cause error en JSON.stringify
+      const circular: any = { data: null };
+      circular.data = circular;
 
-      expect(() => exportToFile(invalidFC)).toThrow('Failed to export GeoJSON');
+      expect(() => exportToFile(circular as any)).toThrow(/Failed to export GeoJSON/);
     });
   });
 

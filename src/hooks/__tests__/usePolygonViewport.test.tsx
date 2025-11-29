@@ -95,5 +95,28 @@ describe('usePolygonViewport', () => {
     
     expect(mockFitBounds).not.toHaveBeenCalled();
   });
+
+  it('should pass a valid LngLatBoundsLike array to fitBounds', () => {
+    const polygon = createTestPolygon([[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]);
+    
+    const { result } = renderHook(() => usePolygonViewport(), { wrapper });
+    
+    act(() => {
+      result.current.centerPolygon(polygon);
+    });
+    
+    // Verificar que fitBounds fue llamado
+    expect(mockFitBounds).toHaveBeenCalled();
+    
+    // Verificar que el primer argumento es un array válido de 4 números (LngLatBoundsLike)
+    const bounds = mockFitBounds.mock.calls[0][0];
+    expect(Array.isArray(bounds)).toBe(true);
+    expect(bounds).toHaveLength(4);
+    expect(bounds.every((n: any) => typeof n === 'number')).toBe(true);
+    
+    // Verificar que el segundo argumento tiene padding
+    const options = mockFitBounds.mock.calls[0][1];
+    expect(options).toEqual({ padding: 50 });
+  });
 });
 

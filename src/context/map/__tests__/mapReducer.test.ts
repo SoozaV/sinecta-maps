@@ -37,4 +37,26 @@ describe('mapReducer', () => {
     expect(newState.draw).toBe(mockDraw);
     expect(newState.map).toBe(mockMap);
   });
+
+  it('should return current state on unknown action', () => {
+    const mockMap = { remove: () => {} } as any;
+    const mockDraw = { anything: true } as any;
+    const stateWithMap: MapState = {
+      isMapReady: true,
+      map: mockMap,
+      draw: mockDraw,
+    };
+
+    // Probamos acción no válida para validar el default case
+    const newState = mapReducer(stateWithMap, {
+      type: 'UNKNOWN_ACTION',
+      payload: null,
+    } as any);
+
+    // El reducer debe retornar el mismo estado sin modificar (misma referencia)
+    expect(newState).toBe(stateWithMap);
+    expect(newState.isMapReady).toBe(true);
+    expect(newState.map).toBe(mockMap);
+    expect(newState.draw).toBe(mockDraw);
+  });
 });

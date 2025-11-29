@@ -31,6 +31,26 @@ describe('polygon.utils', () => {
       expect(coords[0]).toHaveLength(5);
       expect(coords[1]).toHaveLength(5);
     });
+
+    it('should throw error when polygon has missing geometry', () => {
+      const badPolygon = {
+        type: 'Feature' as const,
+        properties: {},
+        // Sin geometry
+      } as any;
+
+      expect(() => getPolygonCoords(badPolygon)).toThrow();
+    });
+
+    it('should throw error when polygon geometry is null', () => {
+      const badPolygon = {
+        type: 'Feature' as const,
+        geometry: null,
+        properties: {},
+      } as any;
+
+      expect(() => getPolygonCoords(badPolygon)).toThrow();
+    });
   });
 
   describe('getPolygonCenter', () => {
@@ -42,8 +62,8 @@ describe('polygon.utils', () => {
       expect(center.geometry.type).toBe('Point');
       expect(center.geometry.coordinates).toHaveLength(2);
       // Centroid of a square should be approximately at (1, 1)
-      expect(center.geometry.coordinates[0]).toBeCloseTo(1, 1);
-      expect(center.geometry.coordinates[1]).toBeCloseTo(1, 1);
+      expect(center.geometry.coordinates[0]).toBeCloseTo(1, 5);
+      expect(center.geometry.coordinates[1]).toBeCloseTo(1, 5);
     });
   });
 
@@ -71,7 +91,11 @@ describe('polygon.utils', () => {
       const area = 1234.567;
       const formatted = formatArea(area);
       
-      expect(formatted).toContain('1,234.57');
+      // Parsear número del string (remover separadores y m²) para ser independiente de locale
+      const numberMatch = formatted.match(/[\d.,\s]+/);
+      expect(numberMatch).not.toBeNull();
+      const parsedNumber = Number(numberMatch![0].replace(/[,\s]/g, ''));
+      expect(parsedNumber).toBeCloseTo(1234.57, 2);
       expect(formatted).toContain('m²');
     });
 
@@ -79,7 +103,11 @@ describe('polygon.utils', () => {
       const area = 1234567.89;
       const formatted = formatArea(area);
       
-      expect(formatted).toContain('1,234,567.89');
+      // Parsear número del string para ser independiente de locale
+      const numberMatch = formatted.match(/[\d.,\s]+/);
+      expect(numberMatch).not.toBeNull();
+      const parsedNumber = Number(numberMatch![0].replace(/[,\s]/g, ''));
+      expect(parsedNumber).toBeCloseTo(1234567.89, 2);
       expect(formatted).toContain('m²');
     });
 
@@ -124,6 +152,15 @@ describe('polygon.utils', () => {
 
     it('should return 0 for degenerate polygons', () => {
       const polygon = createTestPolygon([[[0, 0], [0, 0], [0, 0], [0, 0]]]);
+      const perimeter = calculatePolygonPerimeter(polygon);
+      
+      // Un polígono degenerado (todos los puntos iguales) tiene perímetro 0
+      expect(perimeter).toBe(0);
+    });
+
+    it('should return 0 for polygon with single point repeated', () => {
+      // Caso extremo: polígono con solo 2 puntos (inicio y cierre)
+      const polygon = createTestPolygon([[[0, 0], [0, 0]]]);
       const perimeter = calculatePolygonPerimeter(polygon);
       
       expect(perimeter).toBe(0);

@@ -44,4 +44,23 @@ describe('placesReducer', () => {
     expect(newState.userLocation).toEqual(location);
     expect(newState.isLoading).toBe(true);
   });
+
+  it('should return current state on unknown action', () => {
+    const stateWithLocation: PlacesState = {
+      isLoading: false,
+      userLocation: [-99.1332, 19.4326],
+    };
+    
+    // Probamos acción no válida para validar el default case
+    // Usamos 'as any' para bypassear el tipo estricto en el test
+    const newState = placesReducer(stateWithLocation, {
+      type: 'UNKNOWN_ACTION',
+      payload: 'test',
+    } as any);
+
+    // El reducer debe retornar el mismo estado sin modificar
+    expect(newState).toBe(stateWithLocation); // Misma referencia (no muta ni crea nuevo objeto)
+    expect(newState.isLoading).toBe(false);
+    expect(newState.userLocation).toEqual([-99.1332, 19.4326]);
+  });
 });
