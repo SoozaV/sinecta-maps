@@ -5,8 +5,8 @@ import { createTestPolygon } from '../../setupTests';
 
 // Mock de las funciones de utils
 const { mockCalculatePolygonPerimeter, mockGetVertexCount, mockFormatArea, mockFormatDistance } = vi.hoisted(() => {
-  const mockCalculatePolygonPerimeter = vi.fn((_polygon: GeoJSON.Feature<GeoJSON.Polygon>) => 1234.56);
-  const mockGetVertexCount = vi.fn((_polygon: GeoJSON.Feature<GeoJSON.Polygon>) => 5);
+  const mockCalculatePolygonPerimeter = vi.fn(() => 1234.56);
+  const mockGetVertexCount = vi.fn(() => 5);
   const mockFormatArea = vi.fn((area: number) => `${area.toLocaleString()} m²`);
   const mockFormatDistance = vi.fn((distance: number) => `${(distance / 1000).toFixed(2)} km`);
   
