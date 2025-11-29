@@ -91,48 +91,13 @@ export const usePolygonsStore = create<PolygonsState>((set) => ({
   loadFirstPolygons: async () => {
     try {
       const { data } = await polygonsApi.get('/api/polygons');
-      
-      // Validar estructura de respuesta del backend
-      // Estructura esperada: data.data = [[{ json_build_object: {...} }]]
-      if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
+
+      // Nueva estructura del backend:
+      // { status: boolean, message: string, data: FeatureCollection }
+      const fc = data?.data as GeoJSON.FeatureCollection | undefined;
+
+      if (!fc || !fc.features || !Array.isArray(fc.features) || fc.features.length === 0) {
         console.warn('No polygons data received from backend');
-        set({
-          polygons: {
-            type: 'FeatureCollection',
-            features: [],
-          },
-        });
-        return;
-      }
-
-      const firstRow = data.data[0];
-      if (!firstRow || !Array.isArray(firstRow) || firstRow.length === 0) {
-        console.warn('Empty polygons array from backend');
-        set({
-          polygons: {
-            type: 'FeatureCollection',
-            features: [],
-          },
-        });
-        return;
-      }
-
-      const jsonBuildObject = firstRow[0]?.json_build_object;
-      if (!jsonBuildObject || !jsonBuildObject.features) {
-        console.warn('Invalid polygon data structure from backend');
-        set({
-          polygons: {
-            type: 'FeatureCollection',
-            features: [],
-          },
-        });
-        return;
-      }
-
-      const fc = jsonBuildObject as GeoJSON.FeatureCollection;
-
-      // Validar que features existe y es un array
-      if (!fc.features || !Array.isArray(fc.features) || fc.features.length === 0) {
         set({
           polygons: {
             type: 'FeatureCollection',
