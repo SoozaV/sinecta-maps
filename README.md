@@ -1,9 +1,9 @@
 # 🗺️ Sinecta Maps
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://reactjs.org/)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black.svg)](https://sinecta-maps.vercel.app/)
+[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF.svg)](https://vitejs.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-4.0-6E9F18.svg)](https://vitest.dev/)
 
 > Professional React + TypeScript application for drawing, editing, and managing polygons on interactive maps using Mapbox GL JS.
 
@@ -47,7 +47,7 @@ cp .env.example .env
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+The app will be available at `http://localhost:5173`
 
 ## 🏗️ Tech Stack
 
@@ -61,10 +61,10 @@ The app will be available at `http://localhost:3000`
 
 ## 📊 Code Quality
 
-- ✅ **Test Coverage**: >70% (target >80%)
+- ✅ **Test Coverage**: >70% coverage with 92 tests
 - ✅ **TypeScript**: Strict mode enabled
-- ✅ **ESLint**: Zero warnings
-- ✅ **CI/CD**: Automated testing and deployment with GitHub Actions
+- ✅ **ESLint**: React 19 + TypeScript plugins
+- ✅ **Error Handling**: Centralized interceptors with offline detection
 
 ## 📁 Project Structure
 
@@ -73,28 +73,35 @@ src/
 ├── components/        # React components
 │   ├── Polygons.tsx  # Main polygon list
 │   ├── MapView.tsx   # Map component
-│   └── PolygonList/  # Polygon list sub-components
+│   ├── PolygonList/  # Polygon list sub-components
+│   └── GeoJSONControls/  # Import/Export controls
 ├── hooks/            # Custom React hooks
 │   ├── usePolygonSelection.ts
 │   ├── usePolygonOperations.ts
 │   ├── usePolygonViewport.ts
 │   └── usePolygonMapEvents.ts
 ├── stores/           # Zustand stores
-│   ├── usePolygonsStore.ts
-│   └── useGlobalStore.ts
+│   ├── usePolygonsStore.ts  # Polygons state
+│   └── useGlobalStore.ts    # Loading & online/offline
 ├── context/          # React Context providers
-│   ├── MapContext.ts
-│   └── PlacesContext.ts
-├── utils/            # Utility functions
-│   ├── polygon.utils.ts
-│   └── errorHandler.ts
-├── services/         # Service layer
-│   └── geojson.service.ts
+│   ├── map/          # MapContext and provider
+│   └── places/       # PlacesContext and provider
+├── interceptors/     # Axios interceptors
+│   ├── error.interceptor.ts    # Error handling & offline detection
+│   └── loading.interceptor.ts  # Global loading state
 ├── apis/             # API clients
-│   ├── polygonsApi.ts
-│   └── geocodingApi.ts
+│   ├── polygonsApi.ts   # Backend API with auth
+│   └── geocodingApi.ts  # Mapbox Geocoding
+├── services/         # Service layer
+│   └── geojson.service.ts  # GeoJSON validation
+├── utils/            # Utility functions
+│   ├── polygon.utils.ts    # Area, perimeter calculations
+│   └── errorHandler.ts     # Error utilities
+├── screens/          # Page components
+│   └── HomeScreen.tsx
 ├── types/            # TypeScript definitions
-└── constants/        # Configuration values
+├── constants/        # Configuration values
+└── helpers/          # Helper functions
 ```
 
 ## 🧪 Testing
@@ -139,12 +146,14 @@ npm run preview
 Configure these in your deployment platform:
 
 - `VITE_MAPBOX_ACCESS_TOKEN` - Mapbox public access token (required)
-- `VITE_MAPBOX_GEOCODING_TOKEN` - Mapbox geocoding token (optional, can use same as above)
+- `VITE_MAPBOX_GEOCODING_TOKEN` - Mapbox geocoding token (optional, fallback to main token)
+- `VITE_BASE_URL` - Backend API URL (e.g., http://localhost:3000)
+- `VITE_API_KEY` - API key for backend authentication (X-API-Key header)
 
 ## 📖 Documentation
 
 - [Architecture Overview](./docs/ARCHITECTURE.md) - Detailed architecture documentation
-- [API Integration](./docs/API.md) - Backend API integration (coming soon)
+- [Documentation Structure](./docs/ESTRUCTURA_DOCUMENTACION.md) - Documentation organization
 
 ## 🛠️ Development
 
@@ -166,24 +175,10 @@ This project uses ESLint with TypeScript and React plugins. Run linting:
 npx eslint . --ext .ts,.tsx
 ```
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## 📝 License
 
 This project is licensed under the MIT License.
 
-## 👤 Author
-
-[Your Name](https://github.com/YOUR_GITHUB_USERNAME)
-
 ---
 
-**Note**: Replace `YOUR_GITHUB_USERNAME` in badges and links (lines 3, 34, 185) with your actual GitHub username.
+Built with ❤️ using React, TypeScript, and Mapbox GL JS

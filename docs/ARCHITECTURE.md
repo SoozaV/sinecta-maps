@@ -421,16 +421,12 @@ DELETE /api/polygons/:id       # Delete polygon
   - Used in `src/apis/geocodingApi.ts` for reverse geocoding (address lookup)
   - Allows separate token management for better monitoring and security
 - `VITE_BASE_URL`: Backend API base URL (used in `src/apis/polygonsApi.ts`)
-  - Currently points to backend (may be outdated)
+  - Currently points to backend
   - Used for all polygon CRUD operations
   - Note: App gracefully handles backend unavailability
-
-### Mapbox Telemetry Blocking
-
-In `src/index.tsx`, Mapbox telemetry events are blocked:
-- Intercepts `window.fetch` calls to `events.mapbox.com`
-- Prevents automatic telemetry data collection
-- Improves privacy and reduces unnecessary network requests
+- `VITE_API_KEY`: API key for backend authentication (used in `src/apis/polygonsApi.ts`)
+  - Sent in `X-API-Key` header
+  - Used for authenticating requests to backend
 
 ## Security Considerations
 
