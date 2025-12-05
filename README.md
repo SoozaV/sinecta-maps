@@ -24,7 +24,7 @@
 
 ### Prerequisites
 
-- Node.js 20+ and npm
+- Node.js 20+ and pnpm
 - Mapbox Access Token ([Get one here](https://account.mapbox.com/access-tokens/))
 
 ### Installation
@@ -35,7 +35,7 @@ git clone https://github.com/YOUR_GITHUB_USERNAME/sinecta-maps.git
 cd sinecta-maps/sinecta-maps-frontend
 
 # Install dependencies
-npm install
+pnpm install
 
 # Copy environment variables
 cp .env.example .env
@@ -44,7 +44,7 @@ cp .env.example .env
 # VITE_MAPBOX_ACCESS_TOKEN=pk.your_token_here
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 The app will be available at `http://localhost:5173`
@@ -108,16 +108,16 @@ src/
 
 ```bash
 # Run tests in watch mode
-npm run test
+pnpm run test
 
 # Run tests with UI
-npm run test:ui
+pnpm run test:ui
 
 # Run tests once with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # Run tests once (CI mode)
-npm run test:run
+pnpm run test:run
 ```
 
 ### Testing Strategy
@@ -135,10 +135,10 @@ The application is automatically deployed to Vercel on push to `main` branch.
 
 ```bash
 # Build for production
-npm run build
+pnpm run build
 
 # Preview production build
-npm run preview
+pnpm run preview
 ```
 
 ### Environment Variables
@@ -159,13 +159,13 @@ Configure these in your deployment platform:
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run test` - Run tests in watch mode
-- `npm run test:ui` - Run tests with UI
-- `npm run test:coverage` - Generate coverage report
-- `npm run test:run` - Run tests once (CI mode)
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run preview` - Preview production build
+- `pnpm run test` - Run tests in watch mode
+- `pnpm run test:ui` - Run tests with UI
+- `pnpm run test:coverage` - Generate coverage report
+- `pnpm run test:run` - Run tests once (CI mode)
 
 ### Code Style
 
